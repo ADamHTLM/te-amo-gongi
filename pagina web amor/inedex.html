@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para mi Gongi</title>
+    <!-- Fuente manuscrita más limpia -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: radial-gradient(circle at top, #a8c7ff 0%, #1b2a4a 60%, #050816 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #1b2a4a;
+        }
+
+        /* ===== PANTALLA DE CONTRASEÑA ===== */
+        #passwordScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top, #a8c7ff 0%, #1b2a4a 60%, #050816 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+            gap: 20px;
+        }
+
+        .password-container {
+            background: rgba(255, 255, 255, 0.96);
+            padding: 50px;
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .password-container h1 {
+            color: #1b2a4a;
+            margin-bottom: 30px;
+            font-size: 34px;
+            font-family: 'Alex Brush', cursive;
+        }
+
+        .password-container input {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #5c7cff;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .password-container input:focus {
+            outline: none;
+            border-color: #1b2a4a;
+            box-shadow: 0 0 10px rgba(92, 124, 255, 0.6);
+        }
+
+        .password-container button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #5c7cff 0%, #3246a8 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .password-container button:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 25px rgba(50, 70, 168, 0.5);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            display: none;
+            margin-top: 10px;
+        }
+
+        /* ===== MENÚ PRINCIPAL ===== */
+        #mainMenu {
+            display: none;
+            text-align: center;
+            z-index: 100;
+        }
+
+        .menu-container {
+            background: rgba(255, 255, 255, 0.96);
+            padding: 50px;
+            border-radius: 22px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+            max-width: 750px;
+            width: 90%;
+        }
+
+        .menu-container h1 {
+            color: #1b2a4a;
+            margin-bottom: 10px;
+            font-size: 40px;
+            font-family: 'Alex Brush', cursive;
+        }
+
+        .days-counter {
+            font-size: 16px;
+            color: #42538f;
+            margin-bottom: 25px;
+        }
+
+        .menu-subtitle {
+            font-size: 14px;
+            color: #6b7bb5;
+            margin-bottom: 25px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .menu-btn {
+            padding: 15px 26px;
+            font-size: 17px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #5c7cff 0%, #3246a8 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: block;
+        }
+
+        .menu-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(92, 124, 255, 0.55);
+        }
+
+        /* ===== CORAZÓN LATIENDO ===== */
+        .heart-fixed {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 46px;
+            height: 46px;
+            background: radial-gradient(circle at 30% 30%, #ffe4f0 0%, #ff4b6e 40%, #c81d4f 100%);
+            transform: rotate(-45deg);
+            animation: heartbeat 1s infinite;
+            box-shadow: 0 0 18px rgba(255, 75, 110, 0.7);
+            z-index: 120;
+        }
+
+        .heart-fixed::before,
+        .heart-fixed::after {
+            content: "";
+            position: absolute;
+            width: 46px;
+            height: 46px;
+            background: radial-gradient(circle at 30% 30%, #ffe4f0 0%, #ff4b6e 40%, #c81d4f 100%);
+            border-radius: 50%;
+        }
+
+        .heart-fixed::before {
+            top: -23px;
+            left: 0;
+        }
+
+        .heart-fixed::after {
+            left: 23px;
+            top: 0;
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1) rotate(-45deg); }
+            25% { transform: scale(1.22) rotate(-45deg); }
+            40% { transform: scale(1) rotate(-45deg); }
+            60% { transform: scale(1.18) rotate(-45deg); }
+            100% { transform: scale(1) rotate(-45deg); }
+        }
+
+        /* ===== CARTA ===== */
+        #cartaSection {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top, #a8c7ff 0%, #1b2a4a 60%, #050816 100%);
+            overflow-y: auto;
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .carta-container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: white;
+            padding: 50px;
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+        }
+
+        .carta-container h2 {
+            color: #1b2a4a;
+            font-size: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-family: 'Alex Brush', cursive;
+        }
+
+        .carta-container p {
+            color: #2b2b2b;
+            line-height: 1.8;
+            font-size: 16px;
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .carta-container .firma {
+            text-align: right;
+            margin-top: 40px;
+            font-style: italic;
+            color: #3246a8;
+        }
+
+        /* ===== GALERÍA DE FOTOS ===== */
+        #fotosSection {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top, #a8c7ff 0%, #1b2a4a 60%, #050816 100%);
+            overflow-y: auto;
+            padding: 40px 20px;
+            z-index: 100;
+        }
+
+        .fotos-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .fotos-container h2 {
+            color: #f5f7ff;
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 40px;
+            font-family: 'Alex Brush', cursive;
+        }
+
+        .tulip-subtitle {
+            text-align: center;
+            color: #c5d6ff;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .galeria {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .galeria img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .galeria img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        }
+
+        /* ===== 10 COSAS QUE AMO DE TI ===== */
+        #cosasSection {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top, #a8c7ff 0%, #1b2a4a 60%, #050816 100%);
+            overflow-y: auto;
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .cosas-container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+        }
+
+        .cosas-container h2 {
+            color: #1b2a4a;
+            font-size: 30px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-family: 'Alex Brush', cursive;
+        }
+
+        .cosas-container ol {
+            padding-left: 20px;
+            color: #2b2b2b;
+        }
+
+        .cosas-container li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        /* ===== MOMENTOS INOLVIDABLES ===== */
+        #momentosSection {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top, #a8c7ff 0%, #1b2a4a 60%, #050816 100%);
+            overflow-y: auto;
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .momentos-container {
+            max-width: 750px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+        }
+
+        .momentos-container h2 {
+            color: #1b2a4a;
+            font-size: 30px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-family: 'Alex Brush', cursive;
+        }
+
+        .timeline {
+            border-left: 3px solid #5c7cff;
+            padding-left: 20px;
+        }
+
+        .timeline-item {
+            margin-bottom: 18px;
+        }
+
+        .timeline-item h3 {
+            font-size: 16px;
+            color: #3246a8;
+            margin-bottom: 4px;
+        }
+
+        .timeline-item p {
+            font-size: 14px;
+            color: #2b2b2b;
+        }
+
+        .snoopy-note {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #42538f;
+            text-align: center;
+        }
+
+        /* ===== CIELO ESTRELLADO ===== */
+        #starrySection {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at bottom, #12203f 0%, #050816 100%);
+            z-index: 100;
+            overflow: hidden;
+        }
+
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .love-messages {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .love-text {
+            position: absolute;
+            font-size: 46px;
+            font-weight: bold;
+            color: rgba(199, 216, 255, 0.9);
+            text-shadow: 0 0 22px rgba(92, 124, 255, 0.9);
+            animation: floatIn 3s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes floatIn {
+            0% {
+                opacity: 0;
+                transform: translateY(100px) scale(0.5);
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-200px) scale(1);
+            }
+        }
+
+        .yoko-text {
+            position: absolute;
+            bottom: 26px;
+            width: 100%;
+            text-align: center;
+            color: #a8c7ff;
+            font-size: 20px;
+            letter-spacing: 1px;
+        }
+
+        /* ===== BOTONES DE VOLVER ===== */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 12px 25px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #1b2a4a;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 101;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: white;
+            transform: scale(1.05);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .password-container {
+                padding: 30px;
+            }
+            .menu-container {
+                padding: 30px;
+            }
+            .carta-container,
+            .cosas-container,
+            .momentos-container {
+                padding: 30px;
+            }
+            .love-text {
+                font-size: 30px;
+            }
+            .menu-btn {
+                padding: 13px 18px;
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- CORAZÓN LATIENDO -->
+    <div class="heart-fixed"></div>
+
+    <!-- PANTALLA DE CONTRASEÑA -->
+    <div id="passwordScreen">
+        <div class="password-container">
+            <h1>Para mi Gongi 💘</h1>
+            <input type="password" id="passwordInput" placeholder="Ingresa la contraseña">
+            <button onclick="checkPassword()">Entrar</button>
+            <div class="error-message" id="errorMessage">Contraseña incorrecta</div>
+        </div>
+    </div>
+
+    <!-- MENÚ PRINCIPAL -->
+    <div id="mainMenu">
+        <div class="menu-container">
+            <h1>Bienvenida, Gongi</h1>
+            <p class="days-counter" id="daysCounter"></p>
+            <p class="menu-subtitle">
+                Esta página es solo para ti: un cielo azul, tulipanes imaginarios y canciones de Danny Ocean y Álvaro Díaz sonando en el fondo.
+            </p>
+            <div class="menu-buttons">
+                <button class="menu-btn" onclick="showSection('carta')">📝 Carta</button>
+                <button class="menu-btn" onclick="showSection('musica')">🎵 Música que me recuerda a ti</button>
+                <button class="menu-btn" onclick="showSection('fotos')">📸 Fotos</button>
+                <button class="menu-btn" onclick="showSection('cosas')">💙 10 cosas que amo de ti</button>
+                <button class="menu-btn" onclick="showSection('momentos')">✨ Momentos inolvidables</button>
+                <button class="menu-btn" onclick="showSection('stars')">⭐ Cielo estrellado</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CARTA -->
+    <div id="cartaSection">
+        <button class="back-btn" onclick="backToMenu()">← Volver</button>
+        <div class="carta-container">
+            <h2>Una carta para ti</h2>
+            <p>
+                Hola mi amor,
+            </p>
+            <p>
+                Quería escribirte estas palabras desde el corazón. Eres lo mejor que me ha pasado en la vida. 
+                Cada momento contigo es especial, cada sonrisa tuya me hace feliz, y simplemente no puedo imaginar 
+                mi vida sin ti. Eres un regalo que valoro más que nada. Agradezco a Dios por haberte puesto en mi camino.
+            </p>
+            <p>
+                Te amo más de lo que las palabras pueden expresar. Gracias por ser tan increíble, por creer en mí, 
+                por estar siempre a mi lado. Eres mi razón de sonreír todos los días. Y sin duda eres la persona con la que 
+                quiero compartir mi vida. Como dice Álvaro Díaz, querer estar a tu la’o hasta que el pelo esté lleno de canas.
+            </p>
+            <p>
+                Prometo estar contigo en todo momento, apoyarte, amarte y hacer que cada día sea especial. 
+                Juntos podemos lograr lo que nos propongamos.
+            </p>
+            <p>
+                Te amo Gongi.
+            </p>
+            <div class="firma">
+                Con todo mi amor,<br>
+                Tu amor 💕
+            </div>
+        </div>
+    </div>
+
+    <!-- MÚSICA -->
+    <div id="musicaSection" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: radial-gradient(circle at top, #a8c7ff 0%, #1b2a4a 60%, #050816 100%); z-index:100; overflow-y:auto; padding:20px;">
+        <button class="back-btn" onclick="backToMenu()">← Volver</button>
+        <div style="max-width: 600px; margin: 100px auto; text-align: center;">
+            <h2 style="color: white; font-size: 32px; margin-bottom: 40px; font-family: 'Alex Brush', cursive;">
+                🎵 Música que me recuerda a ti
+            </h2>
+            <iframe width="100%" height="400" src="https://www.youtube.com/embed/SlrxMRjY0zs" 
+                title="YouTube video player" frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen style="border-radius: 10px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);"></iframe>
+            <p style="color: white; margin-top: 20px; font-size: 16px;">Álvaro Díaz - Gongoli</p>
+        </div>
+    </div>
+
+    <!-- FOTOS -->
+    <div id="fotosSection">
+        <button class="back-btn" onclick="backToMenu()">← Volver</button>
+        <div class="fotos-container">
+            <h2>📸 Nuestros momentos especiales</h2>
+            <p class="tulip-subtitle">Como un ramo de tulipanes azules, cada foto es un recuerdo que quiero cuidar contigo.</p>
+            <div class="galeria">
+                <img src="IMG-20251228-WA0000.jpg" alt="Foto 1">
+                <img src="IMG_20250921_232916_edit_194782479713508.jpg" alt="Foto 2">
+                <img src="IMG-20251018-WA0022.jpg" alt="Foto 3">
+                <img src="IMG-20251207-WA0003.jpg" alt="Foto 4">
+                <img src="IMG-20251207-WA0004.jpg" alt="Foto 5">
+                <img src="IMG-20251228-WA0012.jpg" alt="Foto 6">
+                <img src="IMG-20251228-WA0011.jpg" alt="Foto 7">
+                <img src="IMG-20251207-WA0008.jpg" alt="Foto 8">
+                <img src="IMG_20251213_145001.jpg" alt="Foto 9">
+            </div>
+        </div>
+    </div>
+
+    <!-- 10 COSAS QUE AMO DE TI -->
+    <div id="cosasSection">
+        <button class="back-btn" onclick="backToMenu()">← Volver</button>
+        <div class="cosas-container">
+            <h2>10 cosas que amo de ti</h2>
+            <ol>
+                <li>Cómo me tratas.</li>
+                <li>Lo agradecida que eres.</li>
+                <li>Lo madura que eres.</li>
+                <li>El siempre estar atenta de mí.</li>
+                <li>La forma tan bonita que tienes de amar.</li>
+                <li>Cómo te esfuerzas por darme detalles.</li>
+                <li>Cómo te esfuerzas por ser mejor mujer conmigo.</li>
+                <li>Tus hermosos ojos.</li>
+                <li>Tus hermosos cachetes.</li>
+                <li>Tú, en general. Toda tú.</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- MOMENTOS INOLVIDABLES -->
+    <div id="momentosSection">
+        <button class="back-btn" onclick="backToMenu()">← Volver</button>
+        <div class="momentos-container">
+            <h2>Momentos inolvidables</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h3>💋 Nuestro primer beso</h3>
+                    <p>El último día de feria, cuando todo el ruido desapareció y solo importábamos tú y yo.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>🍽️ La cita con Daniel y Natalia</h3>
+                    <p>Una noche sencilla que se volvió especial solo por tenerte cerca.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>🍦 La primera vez que comimos helado</h3>
+                    <p>Entre risas y cucharadas, entendí que contigo hasta lo más simple sabe diferente.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>🌸 Cuando te di una flor</h3>
+                    <p>Cómo te brillaban los ojos la primera vez que te entregué una flor, como si te hubiera dado el mundo.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>🌃 El mirador</h3>
+                    <p>La vez que te pedí salir en el mirador, con el mundo abajo y tú siendo mi única respuesta.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>🔥 Nuestra primera vez</h3>
+                    <p>Un momento solo nuestro, lleno de nervios, cariño y confianza.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>🎆 Nochevieja y Año Nuevo</h3>
+                    <p>Pasar el cambio de año contigo, sintiendo que todo lo que venga será mejor si es a tu lado.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>🏛️ Ir juntos al ayuntamiento</h3>
+                    <p>Ir juntos al ayuntamiento para arreglar mis papeles, demostrándome que estás conmigo en lo bonito y en lo difícil.</p>
+                </div>
+            </div>
+            <p class="snoopy-note">
+                Contigo, hasta estar tirados en el sofá viendo cualquier cosa se siente como un capítulo de Snoopy: simple, suave y perfecto.
+            </p>
+        </div>
+    </div>
+
+    <!-- CIELO ESTRELLADO -->
+    <div id="starrySection">
+        <button class="back-btn" onclick="backToMenu()">← Volver</button>
+        <div class="stars" id="starsContainer"></div>
+        <div class="love-messages" id="loveMessages"></div>
+        <div class="yoko-text">Siempre serás mi Yoko</div>
+    </div>
+
+    <script>
+        // CONTRASEÑA
+        const PASSWORD = "1810";
+
+        function checkPassword() {
+            const input = document.getElementById('passwordInput');
+            const errorMsg = document.getElementById('errorMessage');
+            
+            if (input.value === PASSWORD) {
+                document.getElementById('passwordScreen').style.display = 'none';
+                document.getElementById('mainMenu').style.display = 'flex';
+                errorMsg.style.display = 'none';
+                updateDaysCounter();
+            } else {
+                errorMsg.style.display = 'block';
+                input.value = '';
+            }
+        }
+
+        // Contador de días juntos (desde 18/10/2025)
+        function updateDaysCounter() {
+            const startDate = new Date(2025, 9, 18); // octubre = 9
+            const today = new Date();
+            const diffTime = today.getTime() - startDate.getTime();
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const counter = document.getElementById('daysCounter');
+            if (counter) {
+                counter.textContent = `Llevamos ${diffDays} días juntos desde el 18/10/2025 ❤️`;
+            }
+        }
+
+        // Enter para confirmar contraseña
+        document.addEventListener('DOMContentLoaded', () => {
+            const input = document.getElementById('passwordInput');
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    checkPassword();
+                }
+            });
+        });
+
+        function hideAllSections() {
+            document.getElementById('cartaSection').style.display = 'none';
+            document.getElementById('musicaSection').style.display = 'none';
+            document.getElementById('fotosSection').style.display = 'none';
+            document.getElementById('cosasSection').style.display = 'none';
+            document.getElementById('momentosSection').style.display = 'none';
+            document.getElementById('starrySection').style.display = 'none';
+        }
+
+        function showSection(section) {
+            document.getElementById('mainMenu').style.display = 'none';
+            hideAllSections();
+            
+            if (section === 'carta') {
+                document.getElementById('cartaSection').style.display = 'block';
+            } else if (section === 'musica') {
+                document.getElementById('musicaSection').style.display = 'block';
+            } else if (section === 'fotos') {
+                document.getElementById('fotosSection').style.display = 'block';
+            } else if (section === 'cosas') {
+                document.getElementById('cosasSection').style.display = 'block';
+            } else if (section === 'momentos') {
+                document.getElementById('momentosSection').style.display = 'block';
+            } else if (section === 'stars') {
+                document.getElementById('starrySection').style.display = 'block';
+                createStarfield();
+                animateLoveMessages();
+            }
+        }
+
+        function backToMenu() {
+            hideAllSections();
+            document.getElementById('mainMenu').style.display = 'flex';
+        }
+
+        // CREAR CIELO ESTRELLADO
+        function createStarfield() {
+            const container = document.getElementById('starsContainer');
+            container.innerHTML = '';
+            
+            for (let i = 0; i < 120; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                container.appendChild(star);
+            }
+        }
+
+        // ANIMAR MENSAJES DE "TE AMO"
+        function animateLoveMessages() {
+            const messages = [
+                'Te amo',
+                'I love you',
+                'Je t\'aime',
+                'Ti amo',
+                'Ich liebe dich',
+                'Я люблю тебя',
+                '我爱你',
+                'أحبك',
+                'Σ\' αγαπώ',
+                'Kocham Cię',
+                '사랑해',
+                'Eu te amo',
+                'Te iubesc',
+                'Seni seviyorum',
+                'Ik hou van jou',
+                'Jeg elsker deg',
+                'Jag älskar dig',
+                'Miluji tě',
+                'Amo-te',
+                'אהובה שלי'
+            ];
+
+            const container = document.getElementById('loveMessages');
+            let index = 0;
+
+            function showMessage() {
+                if (index < messages.length) {
+                    const msg = document.createElement('div');
+                    msg.className = 'love-text';
+                    msg.textContent = messages[index];
+                    msg.style.left = Math.random() * 80 + 10 + '%';
+                    msg.style.top = Math.random() * 60 + 20 + '%';
+                    
+                    container.appendChild(msg);
+                    
+                    setTimeout(() => {
+                        msg.remove();
+                    }, 3000);
+
+                    index++;
+                    setTimeout(showMessage, 800);
+                } else {
+                    index = 0;
+                    setTimeout(showMessage, 2000);
+                }
+            }
+
+            container.innerHTML = '';
+            showMessage();
+        }
+    </script>
+</body>
+</html>
